@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import { StageGrid } from "./mesh/grid";
-import { PlayerMesh, PlayerBullet } from "./mesh/player";
+import { PlayerMesh, PlayerBullet, MAX_SHOT_CHARGE_COUNT } from "./mesh/player";
 import { EnemyMesh, EnemyBullet, EnemyFragment } from "./mesh/enemy";
 import { MainCamera } from "./scene/camera";
 import { Sound as sound } from "./scene/sound";
@@ -279,5 +279,44 @@ export class Controller {
         this.enemyFragments.splice(fragmentIndex, 1);
       }
     });
+  }
+
+  displayChargeEffect() {
+    const factor =
+      this.character.shotChargeCount / (MAX_SHOT_CHARGE_COUNT * 0.5);
+
+    if (!this.character.shotChargeEffects.length) {
+      this.character.supplyChargeEffect();
+      this.scene.add(...this.character.shotChargeEffects);
+    }
+
+    this.character.shotChargeEffects.forEach((line) => {
+      const { array: positions } = line.geometry.attributes.position;
+
+      for (let i = 0; i < positions.length; i += 3) {
+        // 自機の周囲にエフェクトを発生
+        positions[i] =
+          this.character.position.x -
+          Math.sin(this.character.rotation.z) +
+          Math.random() * factor;
+        positions[i + 1] = this.character.position.y + Math.random() * factor;
+        positions[i + 2] =
+          this.character.position.z -
+          Math.cos(this.character.rotation.z) +
+          Math.random() * factor;
+      }
+
+      // 位置の更新を反映
+      line.geometry.attributes.position.needsUpdate = true;
+    });
+
+    // ジオメトリキャッシュを回避するために定期的にエフェクトを再生成
+    setTimeout(() => {
+      this.character.shotChargeEffects.forEach((line) => {
+        this.scene.remove(line);
+        this.character.shotChargeEffects = [];
+        line.geometry.dispose();
+      });
+    }, 500);
   }
 }

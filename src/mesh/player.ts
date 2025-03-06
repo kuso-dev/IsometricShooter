@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const MAX_HP = 100;
-const MAX_SHOT_CHARGE_COUNT = 300;
+export const MAX_SHOT_CHARGE_COUNT = 300;
 
 export type PlayerBullet = THREE.Mesh & {
   velocity: THREE.Vector3;
@@ -16,6 +16,7 @@ export class PlayerMesh extends THREE.Mesh {
   invincible: boolean = false;
   hitPoint: number = MAX_HP;
   shotChargeCount: number = 0;
+  shotChargeEffects: THREE.Line[] = [];
 
   constructor() {
     const geometry = new THREE.ConeGeometry(0.3, 1, 3);
@@ -58,7 +59,7 @@ export class PlayerMesh extends THREE.Mesh {
   makeBullet(): PlayerBullet {
     const bulletGeometry = new THREE.SphereGeometry(0.2, 8, 8);
     const bulletMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00ff00,
+      color: 0x00ffff,
       transparent: true,
       opacity: 0.25,
     });
@@ -81,6 +82,26 @@ export class PlayerMesh extends THREE.Mesh {
       -bullet.speed * Math.sin(this.rotation.z) + this.velocity.x;
 
     return bullet;
+  }
+
+  supplyChargeEffect() {
+    for (let i = 0; i < 5; i++) {
+      const line = this.makeLine();
+      this.shotChargeEffects.push(line);
+    }
+  }
+
+  private makeLine() {
+    const segmentCount = 15;
+    const points = Array(segmentCount).fill(new THREE.Vector3(0, 0, 0));
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const lineMaterial = new THREE.LineBasicMaterial({
+      color: 0x00ffff,
+      transparent: true,
+      opacity: 0.5,
+    });
+
+    return new THREE.Line(geometry, lineMaterial);
   }
 
   // MARK: STATUS OPERATION

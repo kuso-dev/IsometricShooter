@@ -81,6 +81,8 @@ const animate = () => {
   game.moveCharacter();
   // 弾の位置を更新
   game.moveBullets();
+  // 溜めエフェクトを更新
+  game.displayChargeEffect();
   // 敵機の位置を更新
   game.moveEnemies();
   // 敵機の弾の位置を更新
@@ -93,6 +95,7 @@ const animate = () => {
   game.moveCamera();
   // 表示を更新
   updateStatusDisplay();
+
   renderer.render(game.scene, game.camera);
 
   if (game.character.hitPoint <= 0) {
