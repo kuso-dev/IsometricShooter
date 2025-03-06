@@ -75,10 +75,10 @@ export class Controller {
       this.character.incrementVelocity();
     }
     if (this.keys["ArrowLeft"]) {
-      this.character.rotation.z -= 0.075; // 左に回転
+      this.character.rotation.z += 0.075;
     }
     if (this.keys["ArrowRight"]) {
-      this.character.rotation.z += 0.075; // 右に回転
+      this.character.rotation.z -= 0.075;
     }
     if (this.keys[" "]) {
       this.character.incrementCharge();
