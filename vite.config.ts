@@ -6,4 +6,5 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   plugins: [tsconfigPaths()],
+  base: process.env.GITHUB_PAGES ? "IsometricShooter" : "./",
 });
