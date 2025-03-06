@@ -1,0 +1,8 @@
+{
+  "name": "isometric_shooter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/kuso-dev/IsometricShooter.git",
+  "author": "kurihara",
+  "license": "MIT"
+}
