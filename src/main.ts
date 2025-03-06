@@ -15,9 +15,9 @@ Object.assign(statusDisplay.style, {
 });
 document.body.appendChild(statusDisplay);
 
-function updateStatusDisplay() {
+const updateStatusDisplay = () => {
   statusDisplay.innerText = game.character.getStatusDescription();
-}
+};
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(800, 600);
@@ -32,40 +32,47 @@ Object.assign(renderer.domElement.style, {
 document.body.appendChild(renderer.domElement);
 
 const game = new Controller();
-game.init();
 
 document.addEventListener("keydown", (event) => {
   if (!isRunning) {
-    isRunning = true;
-    IdleScreen.destroy();
-    animate();
+    startGame();
   }
   game.keys[event.key] = true;
 });
 
-document.addEventListener("keyup", (event) => {
-  if (event.key === " ") {
-    game.fireBullet();
-  }
-  game.keys[event.key] = false;
-});
+const registrationListeners = () => {
+  document.addEventListener("keyup", (event) => {
+    if (event.key === " ") {
+      game.fireBullet();
+    }
+    game.keys[event.key] = false;
+  });
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible") {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") {
+      isRunning = false;
+      return;
+    }
+  });
+
+  window.addEventListener("focus", () => {
     isRunning = false;
-    return;
-  }
-});
+  });
 
-window.addEventListener("focus", () => {
-  isRunning = false;
-});
+  window.addEventListener("blur", () => {
+    isRunning = false;
+  });
+};
 
-window.addEventListener("blur", () => {
-  isRunning = false;
-});
+const startGame = () => {
+  isRunning = true;
+  IdleScreen.destroy();
+  game.init();
+  registrationListeners();
+  animate();
+};
 
-function animate() {
+const animate = () => {
   if (!isRunning) return;
   requestAnimationFrame(animate);
   // キー入力を反映
@@ -93,6 +100,6 @@ function animate() {
     alert("Game Over");
     location.reload();
   }
-}
+};
 
 IdleScreen.create();
