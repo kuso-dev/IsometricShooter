@@ -37,7 +37,7 @@ document.addEventListener("keydown", (event) => {
   if (!isRunning) {
     startGame();
   }
-  game.keys[event.key] = true;
+  game.keys[event.key.toLowerCase()] = true;
 });
 
 const registrationListeners = () => {
@@ -45,7 +45,7 @@ const registrationListeners = () => {
     if (event.key === " ") {
       game.fireBullet();
     }
-    game.keys[event.key] = false;
+    game.keys[event.key.toLowerCase()] = false;
   });
 
   document.addEventListener("visibilitychange", () => {
@@ -79,6 +79,8 @@ const animate = () => {
   game.evalKeys();
   // 自機の位置を更新
   game.moveCharacter();
+  // 自機の残像を更新
+  game.updateTrails();
   // 弾の位置を更新
   game.moveBullets();
   // 溜めエフェクトを更新

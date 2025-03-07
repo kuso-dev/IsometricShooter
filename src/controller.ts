@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { StageGrid } from "./mesh/grid";
 import { PlayerMesh, PlayerBullet, MAX_SHOT_CHARGE_COUNT } from "./mesh/player";
 import { EnemyMesh, EnemyBullet, EnemyFragment } from "./mesh/enemy";
+import { TrailMesh } from "./mesh/trail";
 import { MainCamera } from "./scene/camera";
 import { Sound as sound } from "./scene/sound";
 
@@ -13,6 +14,7 @@ export class Controller {
   camera: MainCamera = new MainCamera();
   stage: StageGrid = new StageGrid();
   character: PlayerMesh = new PlayerMesh();
+  trails: TrailMesh[] = TrailMesh.makeTrails();
   enemies: EnemyMesh[] = [];
   enemyFragments: EnemyFragment[] = [];
   bullets: PlayerBullet[] = [];
@@ -28,6 +30,7 @@ export class Controller {
   init() {
     this.scene.add(this.stage);
     this.scene.add(this.character);
+    this.scene.add(...this.trails);
 
     // 敵を追加する間隔を設定
     setInterval(this.addEnemy, 1000);
@@ -71,13 +74,13 @@ export class Controller {
   }
 
   evalKeys() {
-    if (this.keys["ArrowUp"]) {
+    if (this.keys["ArrowUp".toLowerCase()]) {
       this.character.incrementForwardVelocity();
     }
-    if (this.keys["ArrowLeft"]) {
+    if (this.keys["ArrowLeft".toLowerCase()]) {
       this.character.rotation.z += 0.075;
     }
-    if (this.keys["ArrowRight"]) {
+    if (this.keys["ArrowRight".toLowerCase()]) {
       this.character.rotation.z -= 0.075;
     }
     if (this.keys[" "]) {
@@ -90,7 +93,7 @@ export class Controller {
       this.character.incrementSideVelocity("right");
     }
 
-    this.character.switchBoost(Boolean(this.keys["Shift"]));
+    this.character.switchBoost(Boolean(this.keys["Shift".toLowerCase()]));
   }
 
   moveCharacter() {
@@ -325,5 +328,27 @@ export class Controller {
         line.geometry.dispose();
       });
     }, 500);
+  }
+
+  updateTrails() {
+    const { trails } = this;
+    trails.forEach((trail, i) => {
+      const isNearTrail = i + 1 === trails.length;
+      const args = {
+        position: isNearTrail
+          ? this.character.position
+          : trails[i + 1].position,
+        rotation: isNearTrail
+          ? this.character.rotation
+          : trails[i + 1].rotation,
+      };
+      trail.update(args);
+
+      trails[i].material.opacity = Math.max(0, i / trails.length - 0.4);
+
+      if (trail.position.distanceTo(this.character.position) < 0.25) {
+        trail.material.opacity = 0;
+      }
+    });
   }
 }
