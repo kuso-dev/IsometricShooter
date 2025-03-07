@@ -72,7 +72,7 @@ export class Controller {
 
   evalKeys() {
     if (this.keys["ArrowUp"]) {
-      this.character.incrementVelocity();
+      this.character.incrementForwardVelocity();
     }
     if (this.keys["ArrowLeft"]) {
       this.character.rotation.z += 0.075;
@@ -83,6 +83,13 @@ export class Controller {
     if (this.keys[" "]) {
       this.character.incrementCharge();
     }
+    if (this.keys["a"]) {
+      this.character.incrementSideVelocity("left");
+    }
+    if (this.keys["d"]) {
+      this.character.incrementSideVelocity("right");
+    }
+
     this.character.switchBoost(Boolean(this.keys["Shift"]));
   }
 

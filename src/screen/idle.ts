@@ -18,7 +18,7 @@ export class IdleScreen {
     const topMargin = 40;
     const descriptionTopMargin = 240;
     const leftMargin = window.innerWidth * 0.1;
-    const lineSpacing = 5;
+    const lineSpacing = 8;
 
     const fontFamily = "monospace";
     ctx.textAlign = "left";
@@ -33,7 +33,7 @@ export class IdleScreen {
     {
       ctx.font = `bold ${descriptionFontSize}px '${fontFamily}'`;
       ctx.fillText(
-        "←,↑,→ : move",
+        "↑ : move forward",
         leftMargin,
         topMargin +
           descriptionTopMargin +
@@ -41,7 +41,7 @@ export class IdleScreen {
           lineSpacing * 0,
       );
       ctx.fillText(
-        "Space : shoot",
+        "←,→ : rotate",
         leftMargin,
         topMargin +
           descriptionTopMargin +
@@ -49,7 +49,7 @@ export class IdleScreen {
           lineSpacing * 1,
       );
       ctx.fillText(
-        "Shift : boost",
+        "a,d : move left and right",
         leftMargin,
         topMargin +
           descriptionTopMargin +
@@ -57,12 +57,28 @@ export class IdleScreen {
           lineSpacing * 2,
       );
       ctx.fillText(
+        "Space : shoot",
+        leftMargin,
+        topMargin +
+          descriptionTopMargin +
+          descriptionFontSize * 4 +
+          lineSpacing * 3,
+      );
+      ctx.fillText(
+        "Shift : boost",
+        leftMargin,
+        topMargin +
+          descriptionTopMargin +
+          descriptionFontSize * 5 +
+          lineSpacing * 4,
+      );
+      ctx.fillText(
         "press any key to start",
         leftMargin,
         topMargin +
           descriptionTopMargin +
-          descriptionFontSize * 6 +
-          lineSpacing * 3,
+          descriptionFontSize * 8 +
+          lineSpacing * 5,
       );
     }
 

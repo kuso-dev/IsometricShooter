@@ -125,11 +125,17 @@ export class PlayerMesh extends THREE.Mesh {
     return `HP: ${this.hitPoint}/${MAX_HP} CHARGE: ${this.shotChargeCount}/${MAX_SHOT_CHARGE_COUNT}`;
   }
 
-  incrementVelocity() {
+  incrementForwardVelocity() {
     this.velocity.z -=
       this.speed * Math.cos(this.rotation.z) * (this.boost ? 3 : 1);
     this.velocity.x -=
       this.speed * Math.sin(this.rotation.z) * (this.boost ? 3 : 1);
+  }
+
+  incrementSideVelocity(direction: "left" | "right") {
+    const coefficient = direction === "left" ? 1 : -1;
+    this.velocity.z += this.speed * Math.sin(this.rotation.z) * coefficient;
+    this.velocity.x -= this.speed * Math.cos(this.rotation.z) * coefficient;
   }
 
   switchBoost(isOn: boolean) {
