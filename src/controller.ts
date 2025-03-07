@@ -41,19 +41,19 @@ export class Controller {
   }
 
   fireBullet() {
+    if (this.character.shotChargeCount < 100) {
+      sound.singleLaser();
+    } else if (this.character.shotChargeCount < 200) {
+      sound.chargeLaser();
+    } else {
+      sound.superChargeLaser();
+    }
+
     const _loop = () => {
       setTimeout(() => {
         const bullet = this.character.makeBullet();
         this.bullets.push(bullet);
         this.scene.add(bullet);
-
-        // NOTE: - 発射音の再生頻度を調整
-        if (
-          this.character.shotChargeCount % 5 === 0 ||
-          this.character.shotChargeCount < 5
-        )
-          sound.laser();
-
         this.character.decrementCharge();
         if (this.character.shotChargeCount > 0) _loop();
       }, 5);
@@ -207,7 +207,8 @@ export class Controller {
       // 敵機への着弾処理
       this.enemies.forEach((enemy, enemyIndex) => {
         const distance = bullet.position.distanceTo(enemy.position);
-        const combinedRadius = 1.0; // 衝突判定
+        const combinedRadius =
+          1.0 + this.character.shotChargeCount / MAX_SHOT_CHARGE_COUNT; // 衝突判定
         if (distance < combinedRadius) {
           this.scene.remove(enemy);
           this.enemies.splice(enemyIndex, 1);

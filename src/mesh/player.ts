@@ -57,29 +57,35 @@ export class PlayerMesh extends THREE.Mesh {
   }
 
   makeBullet(): PlayerBullet {
-    const bulletGeometry = new THREE.SphereGeometry(0.2, 8, 8);
-    const bulletMaterial = new THREE.MeshBasicMaterial({
+    const bulletRadiusFactor =
+      this.shotChargeCount / (MAX_SHOT_CHARGE_COUNT * 0.5);
+
+    const length = 7; // レーザーの長さ
+    const radius = Math.max(0.1, 1 * bulletRadiusFactor);
+    const geometry = new THREE.CylinderGeometry(radius, radius, length, 8);
+    const material = new THREE.MeshBasicMaterial({
       color: 0x00ffff,
       transparent: true,
       opacity: 0.25,
+      wireframe: true,
     });
-    const mesh = new THREE.Mesh(bulletGeometry, bulletMaterial);
-    mesh.position.set(
-      this.position.x - Math.sin(this.rotation.z),
-      this.position.y,
-      this.position.z - Math.cos(this.rotation.z),
-    );
-    mesh.rotation.copy(this.rotation);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.set(-Math.PI / 2, 0, 0);
+
+    mesh.position.set(this.position.x, this.position.y, this.position.z);
+    mesh.rotation.z = this.rotation.z;
+
+    const offset = length / 2; // 中心位置に合わせ
+    mesh.position.z -= offset * Math.cos(this.rotation.z);
+    mesh.position.x -= offset * Math.sin(this.rotation.z);
 
     const bullet = Object.assign(mesh, {
       velocity: new THREE.Vector3(),
-      speed: 0.5,
+      speed: 1,
     });
 
-    bullet.velocity.z =
-      -bullet.speed * Math.cos(this.rotation.z) + this.velocity.z;
-    bullet.velocity.x =
-      -bullet.speed * Math.sin(this.rotation.z) + this.velocity.x;
+    bullet.velocity.z = -bullet.speed * Math.cos(this.rotation.z);
+    bullet.velocity.x = -bullet.speed * Math.sin(this.rotation.z);
 
     return bullet;
   }
