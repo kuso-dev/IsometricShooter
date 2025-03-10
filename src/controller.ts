@@ -12,6 +12,7 @@ const MAX_ENEMY_COUNT = 10;
 export class Controller {
   scene: THREE.Scene = new THREE.Scene();
   camera: MainCamera = new MainCamera();
+  gameSpeedRatio = 1;
   stage: StageMesh = new StageMesh();
   character: PlayerMesh = new PlayerMesh();
   trails: TrailMesh[] = TrailMesh.makeTrails();
@@ -130,6 +131,8 @@ export class Controller {
   }
 
   moveEnemies() {
+    const enemySpeed = EnemyMesh.speed * this.gameSpeedRatio;
+
     this.enemies.forEach((enemy) => {
       const minDistance = 5; // 敵とキャラクター間の最小距離
       const safeDistance = 2.5; // 敵同士の間の距離
@@ -145,7 +148,7 @@ export class Controller {
       direction
         .normalize()
         .multiplyScalar(
-          direction.length() < minDistance ? enemy.speed : -enemy.speed,
+          direction.length() < minDistance ? enemySpeed : -enemySpeed,
         );
 
       enemy.position.x += direction.x;
@@ -159,7 +162,7 @@ export class Controller {
             const avoidDirection = new THREE.Vector3()
               .subVectors(enemy.position, otherEnemy.position)
               .normalize()
-              .multiplyScalar(enemy.speed);
+              .multiplyScalar(enemySpeed);
             enemy.position.add(avoidDirection);
           }
         }
@@ -227,8 +230,8 @@ export class Controller {
   moveEnemyBullets() {
     const gridBoundary = StageMesh.gridSize / 2 - 0.5;
     this.enemyBullets.forEach((enemyBullet, bulletIndex) => {
-      enemyBullet.position.x += enemyBullet.velocity.x;
-      enemyBullet.position.z += enemyBullet.velocity.z;
+      enemyBullet.position.x += enemyBullet.velocity.x * this.gameSpeedRatio;
+      enemyBullet.position.z += enemyBullet.velocity.z * this.gameSpeedRatio;
 
       // 領域の範囲外に出たら弾を削除
       if (

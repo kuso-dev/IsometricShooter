@@ -73,6 +73,14 @@ export class IdleScreen {
           lineSpacing * 4,
       );
       ctx.fillText(
+        "s : bullet time",
+        leftMargin,
+        topMargin +
+          descriptionTopMargin +
+          descriptionFontSize * 6 +
+          lineSpacing * 5,
+      );
+      ctx.fillText(
         "press any key to start",
         leftMargin,
         topMargin +

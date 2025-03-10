@@ -1,7 +1,9 @@
 import * as THREE from "three";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 
-import { Controller } from "./controller";
-import { IdleScreen } from "./screen/idle";
+import { Controller } from "@/controller";
+import { IdleScreen } from "@/screen/idle";
+import { EffectComposer } from "@/scene/effect";
 
 let isRunning = false;
 
@@ -64,6 +66,10 @@ const registrationListeners = () => {
   });
 };
 
+// ポストプロセッシングの設定
+const renderPass = new RenderPass(game.scene, game.camera);
+const composer = new EffectComposer(renderer, renderPass);
+
 const startGame = () => {
   isRunning = true;
   IdleScreen.destroy();
@@ -98,7 +104,23 @@ const animate = () => {
   // 表示を更新
   updateStatusDisplay();
 
-  renderer.render(game.scene, game.camera);
+  // TODO: - 実装箇所検討
+  // バレットタイム移行
+  if (game.keys["s"]) {
+    composer.activateBloomPass();
+    composer.activateVignettePass();
+
+    game.camera.zoomIn();
+    game.gameSpeedRatio = 0.2;
+  } else {
+    composer.deactivateBloomPass();
+    composer.deactivateVignettePass();
+
+    game.camera.zoomOut();
+    game.gameSpeedRatio = 1;
+  }
+
+  composer.render();
 
   if (game.character.hitPoint <= 0) {
     isRunning = false;

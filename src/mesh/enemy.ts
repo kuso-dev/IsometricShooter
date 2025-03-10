@@ -3,7 +3,6 @@ import { PlayerMesh } from "./player";
 
 export type EnemyBullet = THREE.Mesh & {
   velocity: THREE.Vector3;
-  speed: number;
 };
 
 export type EnemyFragment = THREE.Mesh & {
@@ -13,7 +12,8 @@ export type EnemyFragment = THREE.Mesh & {
 };
 
 export class EnemyMesh extends THREE.Mesh {
-  readonly speed: number = 0.0125;
+  static readonly speed: number = 0.01;
+  static readonly bulletSpeed: number = 0.1;
 
   constructor() {
     const geometry = new THREE.BoxGeometry(0.5, 1, 0.5);
@@ -35,14 +35,13 @@ export class EnemyMesh extends THREE.Mesh {
 
     const bullet = Object.assign(mesh, {
       velocity: new THREE.Vector3(),
-      speed: 0.1,
     });
     const direction = new THREE.Vector3(
       character.position.x - this.position.x,
       0,
       character.position.z - this.position.z,
     );
-    direction.normalize().multiplyScalar(bullet.speed);
+    direction.normalize().multiplyScalar(EnemyMesh.bulletSpeed);
     bullet.velocity.copy(direction);
 
     return bullet;

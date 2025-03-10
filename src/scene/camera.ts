@@ -31,4 +31,22 @@ export class MainCamera extends THREE.OrthographicCamera {
 
     _shake();
   }
+
+  zoomIn() {
+    const zoomRatio = 1.2;
+
+    if (this.zoom < zoomRatio) {
+      this.zoom = Math.min(zoomRatio, this.zoom + 0.01);
+      this.updateProjectionMatrix();
+    }
+  }
+
+  zoomOut() {
+    const zoomRatio = 1.0;
+
+    if (this.zoom > zoomRatio) {
+      this.zoom = Math.max(zoomRatio, this.zoom - 0.01);
+      this.updateProjectionMatrix();
+    }
+  }
 }
