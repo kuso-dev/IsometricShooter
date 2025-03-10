@@ -9,7 +9,7 @@ export type PlayerBullet = THREE.Mesh & {
 };
 
 export class PlayerMesh extends THREE.Mesh {
-  readonly speed: number = 0.025;
+  readonly speed: number = 0.01;
   private boost: boolean = false;
 
   velocity: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
@@ -60,7 +60,7 @@ export class PlayerMesh extends THREE.Mesh {
     const bulletRadiusFactor =
       this.shotChargeCount / (MAX_SHOT_CHARGE_COUNT * 0.5);
 
-    const length = 7; // レーザーの長さ
+    const length = 2; // レーザーの長さ
     const radius = Math.max(0.1, 1 * bulletRadiusFactor);
     const geometry = new THREE.CylinderGeometry(radius, radius, length, 8);
     const material = new THREE.MeshBasicMaterial({

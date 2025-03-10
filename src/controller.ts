@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { StageGrid } from "./mesh/grid";
+import { StageMesh } from "./mesh/stage";
 import { PlayerMesh, PlayerBullet, MAX_SHOT_CHARGE_COUNT } from "./mesh/player";
 import { EnemyMesh, EnemyBullet, EnemyFragment } from "./mesh/enemy";
 import { TrailMesh } from "./mesh/trail";
@@ -12,7 +12,7 @@ const MAX_ENEMY_COUNT = 10;
 export class Controller {
   scene: THREE.Scene = new THREE.Scene();
   camera: MainCamera = new MainCamera();
-  stage: StageGrid = new StageGrid();
+  stage: StageMesh = new StageMesh();
   character: PlayerMesh = new PlayerMesh();
   trails: TrailMesh[] = TrailMesh.makeTrails();
   enemies: EnemyMesh[] = [];
@@ -28,7 +28,7 @@ export class Controller {
   }
 
   init() {
-    this.scene.add(this.stage);
+    this.scene.add(...this.stage.tiles);
     this.scene.add(this.character);
     this.scene.add(...this.trails);
 
@@ -56,7 +56,7 @@ export class Controller {
         this.scene.add(bullet);
         this.character.decrementCharge();
         if (this.character.shotChargeCount > 0) _loop();
-      }, 5);
+      }, 2);
     };
     _loop();
   }
@@ -97,23 +97,18 @@ export class Controller {
   }
 
   moveCharacter() {
+    const isColliding = this.stage.collisionDetection(
+      this.character.position.clone().add(this.character.velocity),
+      this.character.scale.clone(),
+    );
+    if (isColliding) {
+      this.character.velocity.multiplyScalar(0);
+      return;
+    }
+
     this.character.position.x += this.character.velocity.x;
     this.character.position.z += this.character.velocity.z;
     this.character.velocity.multiplyScalar(0.9); // 慣性処理
-
-    // 領域の端を越えた場合に反対側に移動
-    const gridBoundary = StageGrid.gridSize - 0.5;
-    if (this.character.position.x > gridBoundary) {
-      this.character.position.x = -gridBoundary;
-    } else if (this.character.position.x < -gridBoundary) {
-      this.character.position.x = gridBoundary;
-    }
-
-    if (this.character.position.z > gridBoundary) {
-      this.character.position.z = -gridBoundary;
-    } else if (this.character.position.z < -gridBoundary) {
-      this.character.position.z = gridBoundary;
-    }
   }
 
   addEnemy() {
@@ -121,11 +116,11 @@ export class Controller {
       const enemy = new EnemyMesh();
       const positionX =
         (Math.random() > 0.5 ? 1 : -1) *
-        (StageGrid.gridSize - 1) *
+        (StageMesh.gridSize / 2 - 2) *
         Math.random();
       const positionZ =
         (Math.random() > 0.5 ? 1 : -1) *
-        (StageGrid.gridSize - 1) *
+        (StageMesh.gridSize / 2 - 2) *
         Math.random();
       enemy.position.set(positionX, 0.5, positionZ);
 
@@ -171,7 +166,7 @@ export class Controller {
       });
 
       // 敵機の移動範囲制限
-      const gridBoundary = StageGrid.gridSize - 0.5;
+      const gridBoundary = StageMesh.gridSize - 2;
       if (
         Math.abs(enemy.position.x) > gridBoundary ||
         Math.abs(enemy.position.z) > gridBoundary
@@ -189,8 +184,18 @@ export class Controller {
   }
 
   moveBullets() {
-    const gridBoundary = StageGrid.gridSize - 0.5;
+    const gridBoundary = StageMesh.gridSize - 0.5;
     this.bullets.forEach((bullet, bulletIndex) => {
+      const isColliding = this.stage.collisionDetection(
+        bullet.position,
+        bullet.scale.clone(),
+      );
+      if (isColliding) {
+        bullet.velocity.multiplyScalar(0);
+        this.scene.remove(bullet);
+        this.bullets.splice(bulletIndex, 1);
+        return;
+      }
       bullet.position.x += bullet.velocity.x;
       bullet.position.z += bullet.velocity.z;
 
@@ -220,7 +225,7 @@ export class Controller {
   }
 
   moveEnemyBullets() {
-    const gridBoundary = StageGrid.gridSize - 0.5;
+    const gridBoundary = StageMesh.gridSize / 2 - 0.5;
     this.enemyBullets.forEach((enemyBullet, bulletIndex) => {
       enemyBullet.position.x += enemyBullet.velocity.x;
       enemyBullet.position.z += enemyBullet.velocity.z;
